@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نتائج الامتحانات الشرعية | معهد الإمام أحمد بن حنبل</title>
+    
+    <!-- Google Fonts: Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Tailwind Config for Custom Colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0F172A', 
+                        gold: '#D4AF37', 
+                        light: '#F8FAFC'
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #F8FAFC; overflow-x: hidden; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 4px solid #D4AF37;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        /* Scrollbar styling */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #0F172A; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #D4AF37; }
+        
+        /* Modal Animation */
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .modal-animate { animation: fadeIn 0.3s ease-out forwards; }
+        
+        /* Mobile Table Adjustments */
+        @media (max-width: 768px) {
+            .hide-on-mobile { display: none !important; }
+            .compact-padding { padding: 0.5rem !important; font-size: 0.85rem !important; }
+        }
+        .student-row:hover { cursor: pointer; background-color: #fef9c3; }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- Header -->
+    <header class="bg-navy text-white shadow-lg relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23D4AF37\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+        <div class="container mx-auto px-4 py-6 relative z-10 flex flex-col md:flex-row items-center justify-between text-center md:text-right">
+            <div class="flex flex-col md:flex-row items-center gap-4 mb-4 md:mb-0">
+                <div class="w-16 h-16 bg-gold rounded-full flex items-center justify-center text-navy text-3xl shadow-lg shrink-0">
+                    <i class="fa-solid fa-book-quran"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-3xl font-bold text-gold">معهد جامع الإمام أحمد بن حنبل</h1>
+                    <p class="text-sm md:text-base opacity-90">لتعليم القرآن الكريم وتفسيره - نتائج المواد الشرعية</p>
+                </div>
+            </div>
+            <div>
+                <span class="bg-gold text-navy px-4 py-2 rounded-full font-bold shadow-md text-sm whitespace-nowrap">
+                    <i class="fa-solid fa-calendar-days ml-1"></i> الدورة الشتوية 2026
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Global Success Toast -->
+    <div id="sheets-toast-global" class="fixed top-4 right-4 z-50 hidden bg-green-100 text-green-800 px-4 py-3 rounded-lg shadow-lg font-bold transition-all border border-green-200 text-sm">
+        <i class="fa-solid fa-check-circle ml-1"></i> تم تحديث النتائج وإرسال الاستعلام بنجاح
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-2 md:px-4 py-6 relative w-full overflow-hidden">
+        
+        <!-- Filters & Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
+            
+            <!-- Filter Panel -->
+            <div class="glass-card rounded-xl p-4 md:p-6 lg:col-span-1">
+                <h2 class="text-lg md:text-xl font-bold text-navy mb-4 border-b border-gray-200 pb-2 flex items-center">
+                    <i class="fa-solid fa-filter text-gold ml-2"></i> لوحة الاستعلام
+                </h2>
+                
+                <div class="space-y-4">
+                    <!-- Search Input with Datalist (Autocomplete) -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">بحث عن طالب</label>
+                        <div class="relative">
+                            <input list="students-list" type="text" id="search-input" placeholder="اكتب الاسم هنا للبحث..." 
+                                class="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition text-sm">
+                            <i class="fa-solid fa-search absolute right-3 top-3 text-gray-400 text-sm"></i>
+                            <datalist id="students-list"></datalist>
+                        </div>
+                    </div>
+
+                    <!-- Subject Filter -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">المادة</label>
+                        <select id="subject-filter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-gold text-sm">
+                            <option value="الكل">جميع المواد المتاحة</option>
+                        </select>
+                    </div>
+
+                    <!-- Level Filter -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">المستوى</label>
+                        <select id="level-filter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-gold text-sm">
+                            <option value="الكل">جميع المستويات المتاحة</option>
+                        </select>
+                    </div>
+
+                    <!-- Action Button -->
+                    <button onclick="triggerSearchAndSync()" id="btn-show-results" class="w-full mt-2 bg-gold text-navy hover:bg-yellow-500 py-2.5 rounded-lg font-bold transition flex items-center justify-center gap-2 shadow-md">
+                        <i class="fa-solid fa-square-poll-vertical"></i> إظهار النتيجة
+                    </button>
+                    
+                    <button onclick="clearSearch()" class="w-full text-xs text-gray-500 hover:text-navy underline transition mt-1 text-center">
+                        إعادة تهيئة الحقول
+                    </button>
+                </div>
+            </div>
+
+            <!-- Charts & Visuals Panel -->
+            <div class="glass-card rounded-xl p-4 md:p-6 lg:col-span-3 flex flex-col">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4 border-b border-gray-100 pb-4">
+                    <div class="bg-gray-50 rounded p-3 text-center border border-gray-100">
+                        <p class="text-xs text-gray-500 mb-1">الطلاب بالنتيجة</p>
+                        <h3 class="text-xl md:text-2xl font-bold text-navy" id="kpi-total-students">0</h3>
+                    </div>
+                    <div class="bg-gray-50 rounded p-3 text-center border border-gray-100">
+                        <p class="text-xs text-gray-500 mb-1">إجمالي الامتحانات</p>
+                        <h3 class="text-xl md:text-2xl font-bold text-navy" id="kpi-total-exams">0</h3>
+                    </div>
+                    <div class="bg-gray-50 rounded p-3 text-center border border-gray-100">
+                        <p class="text-xs text-gray-500 mb-1">المتوسط العام</p>
+                        <h3 class="text-xl md:text-2xl font-bold text-navy" id="kpi-avg-score">0%</h3>
+                    </div>
+                    <div class="bg-yellow-50 rounded p-3 text-center border border-yellow-100">
+                        <p class="text-xs text-yellow-700 mb-1">متميزون (100)</p>
+                        <h3 class="text-xl md:text-2xl font-bold text-gold" id="kpi-perfect-scores">0</h3>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 items-center">
+                    <div class="w-full h-48 md:h-56">
+                        <canvas id="scoresChart"></canvas>
+                    </div>
+                    <div class="w-full h-48 md:h-56 flex justify-center">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Master Data Table (Grouped by Student - Mobile Friendly) -->
+        <div class="glass-card rounded-xl overflow-hidden mb-8 w-full">
+            <div class="p-4 md:p-6 border-b border-gray-200 flex justify-between items-center bg-white">
+                <div>
+                    <h2 class="text-lg md:text-xl font-bold text-navy">
+                        <i class="fa-solid fa-users-viewfinder text-gold ml-1"></i> نظرة عامة (الطلاب)
+                    </h2>
+                </div>
+                <span id="results-count" class="text-xs md:text-sm bg-navy text-gold px-3 py-1 rounded-full font-bold">0 طالب</span>
+            </div>
+            <!-- Removed overflow-x-auto to fit the container natively. Text wrapping and hiding handles small screens -->
+            <table class="w-full text-right border-collapse table-fixed">
+                <thead>
+                    <tr class="bg-navy text-white text-xs md:text-sm">
+                        <th class="p-2 md:p-4 font-semibold w-1/2 md:w-auto">اسم الطالب</th>
+                        <th class="p-2 md:p-4 font-semibold text-center hide-on-mobile w-20">المواد</th>
+                        <th class="p-2 md:p-4 font-semibold text-center w-24">المتوسط</th>
+                        <th class="p-2 md:p-4 font-semibold hide-on-mobile w-32">التقدير</th>
+                        <th class="p-2 md:p-4 font-semibold text-center w-28">إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body" class="bg-white divide-y divide-gray-100 text-sm">
+                    <!-- Rows injected by JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Detailed Exams Table (Requested flat table - Mobile Friendly) -->
+        <div class="glass-card rounded-xl overflow-hidden w-full">
+            <div class="p-4 md:p-6 border-b border-gray-200 bg-white">
+                <h2 class="text-lg md:text-xl font-bold text-navy">
+                    <i class="fa-solid fa-table-list text-gold ml-1"></i> سجل العلامات التفصيلي لكل مادة
+                </h2>
+                <p class="text-xs text-gray-500 mt-1">يعرض علامة كل طالب في المادة والمستوى بشكل مباشر ومستقل</p>
+            </div>
+            <table class="w-full text-right border-collapse table-fixed">
+                <thead>
+                    <tr class="bg-gray-100 text-navy border-b border-gray-200 text-xs md:text-sm">
+                        <th class="p-2 md:p-4 font-bold w-1/3">اسم الطالب</th>
+                        <th class="p-2 md:p-4 font-bold w-1/4">المادة</th>
+                        <th class="p-2 md:p-4 font-bold hide-on-mobile w-1/4">المستوى</th>
+                        <th class="p-2 md:p-4 font-bold text-center w-20">العلامة</th>
+                    </tr>
+                </thead>
+                <tbody id="detailed-table-body" class="bg-white divide-y divide-gray-100 text-sm">
+                    <!-- Detailed rows injected by JS -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- 🌟 Student Dashboard Modal 🌟 -->
+    <div id="student-dashboard-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-navy bg-opacity-80 backdrop-blur-sm p-2 md:p-4">
+        <div class="bg-gray-50 rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden modal-animate flex flex-col max-h-[95vh]">
+            
+            <div class="bg-navy text-white p-4 md:p-5 flex justify-between items-center border-b-4 border-gold">
+                <h3 class="font-bold text-lg md:text-2xl flex items-center gap-2">
+                    <i class="fa-solid fa-user-graduate text-gold text-2xl"></i>
+                    <span id="sd-name">اسم الطالب</span>
+                </h3>
+                <button onclick="closeStudentDashboard()" class="text-gray-300 hover:text-white transition text-2xl px-2">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-4 md:p-6 overflow-y-auto flex-1 bg-gray-50">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                    
+                    <div class="md:col-span-1 space-y-4 md:space-y-6">
+                        <div class="bg-white rounded-xl shadow p-4 border-t-2 border-gold">
+                            <h4 class="text-gray-500 font-semibold mb-3 text-sm"><i class="fa-solid fa-id-card ml-1"></i>بطاقة الطالب</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between border-b pb-1">
+                                    <span class="text-gray-600">المواد:</span>
+                                    <span class="font-bold text-navy" id="sd-exams-count">0</span>
+                                </div>
+                                <div class="flex justify-between border-b pb-1">
+                                    <span class="text-gray-600">المتوسط:</span>
+                                    <span class="font-bold text-navy" id="sd-avg-score">0%</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">التقدير:</span>
+                                    <span class="font-bold" id="sd-grade">مقبول</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-navy rounded-xl shadow p-4 text-white">
+                            <h4 class="font-bold mb-2 flex items-center gap-1 text-gold border-b border-gray-600 pb-2 text-sm">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> الموجه الذكي
+                            </h4>
+                            <button onclick="triggerAIAnalysis()" id="btn-ai" class="w-full bg-gold text-navy font-bold py-1.5 rounded-lg hover:bg-yellow-500 transition shadow text-sm">
+                                توليد تحليل للأداء
+                            </button>
+                            <div id="sd-ai-loading" class="hidden text-center py-2">
+                                <div class="typing-indicator mb-1"><span></span><span></span><span></span></div>
+                                <p class="text-[10px] text-gray-300">جاري التحليل...</p>
+                            </div>
+                            <div id="sd-ai-result" class="hidden mt-3 bg-slate-800 p-2 rounded text-xs leading-relaxed text-gray-200 border border-slate-600"></div>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-2 space-y-4 md:space-y-6">
+                        <div class="bg-white rounded-xl shadow p-3">
+                            <h4 class="text-navy font-bold text-sm mb-2"><i class="fa-solid fa-chart-line ml-1 text-gold"></i>مخطط الأداء</h4>
+                            <div class="w-full h-36 md:h-48">
+                                <canvas id="sd-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow overflow-hidden">
+                            <table class="w-full text-right text-xs md:text-sm table-fixed">
+                                <thead class="bg-gray-100 text-navy">
+                                    <tr>
+                                        <th class="p-2 md:p-3 font-semibold w-1/3">المادة</th>
+                                        <th class="p-2 md:p-3 font-semibold hide-on-mobile w-1/3">المستوى</th>
+                                        <th class="p-2 md:p-3 font-semibold text-center w-1/3">العلامة</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sd-table-body" class="divide-y divide-gray-100">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const geminiApiKey = ""; // مفتاح Gemini
+        const googleAppScriptUrl = ""; // رابط Google Apps Script Webhook
+
+        // 1. Raw Data Base
+        const rawData = [
+            // الفقه 4 + حديث + سيرة 2
+            { name: "الأمير نزار نقار", subject: "الفقه", level: "المستوى الرابع", score: 100 },
+            { name: "الأمير نزار نقار", subject: "الحديث", level: "عام", score: 99.5 },
+            { name: "الأمير نزار نقار", subject: "السيرة", level: "المستوى الثاني", score: 100 },
+            { name: "بشار بطش", subject: "الفقه", level: "المستوى الرابع", score: 98 },
+            { name: "بشار بطش", subject: "الحديث", level: "عام", score: 99.5 },
+            { name: "بشار بطش", subject: "السيرة", level: "المستوى الثاني", score: 99.5 },
+            { name: "يزن الأسعد", subject: "الفقه", level: "المستوى الرابع", score: 92.5 },
+            { name: "يزن الأسعد", subject: "الحديث", level: "عام", score: 99.5 },
+            { name: "يزن الأسعد", subject: "السيرة", level: "المستوى الثاني", score: 99 },
+            { name: "فراس شيخ عمر", subject: "الفقه", level: "المستوى الرابع", score: 86 },
+            { name: "فراس شيخ عمر", subject: "الحديث", level: "عام", score: 99.5 },
+            { name: "فراس شيخ عمر", subject: "السيرة", level: "المستوى الثاني", score: 98 },
+            { name: "محمد نجم علي", subject: "الفقه", level: "المستوى الرابع", score: 92 },
+            { name: "محمد نجم علي", subject: "الحديث", level: "عام", score: 99.5 },
+            { name: "محمد نجم علي", subject: "السيرة", level: "المستوى الثاني", score: 89 },
+            { name: "علي الحجي", subject: "الفقه", level: "المستوى الرابع", score: 91 },
+            { name: "علي الحجي", subject: "الحديث", level: "عام", score: 94 },
+            { name: "علي الحجي", subject: "السيرة", level: "المستوى الثاني", score: 85 },
+            { name: "عمر حشاش", subject: "الفقه", level: "المستوى الرابع", score: 73 },
+            { name: "عمر حشاش", subject: "الحديث", level: "عام", score: 87 },
+            { name: "عمر حشاش", subject: "السيرة", level: "المستوى الثاني", score: 85 },
+            { name: "محمد وليد كردي", subject: "الفقه", level: "المستوى الرابع", score: 63 },
+            { name: "محمد وليد كردي", subject: "الحديث", level: "عام", score: 89 },
+            { name: "محمد وليد كردي", subject: "السيرة", level: "المستوى الثاني", score: 64 },
+            { name: "عبد الله هنو", subject: "الفقه", level: "المستوى الرابع", score: 59 },
+            { name: "عبد الله هنو", subject: "الحديث", level: "عام", score: 99 },
+            { name: "عبد الله هنو", subject: "السيرة", level: "المستوى الثاني", score: 90 },
+            { name: "عبد الله العبيد", subject: "الفقه", level: "المستوى الرابع", score: 56 },
+            { name: "عبد الله العبيد", subject: "الحديث", level: "عام", score: 80 },
+            { name: "عبد الله العبيد", subject: "السيرة", level: "المستوى الثاني", score: 90 },
+            { name: "محمد قصاب", subject: "الفقه", level: "المستوى الرابع", score: 46 },
+            { name: "محمد قصاب", subject: "الحديث", level: "عام", score: 83 },
+            { name: "محمد قصاب", subject: "السيرة", level: "المستوى الثاني", score: 60 },
+            { name: "محمود فقش", subject: "الفقه", level: "المستوى الرابع", score: 31 },
+            { name: "محمود فقش", subject: "الحديث", level: "عام", score: 59 },
+            { name: "محمود فقش", subject: "السيرة", level: "المستوى الثاني", score: 80 },
+            
+            // الفقه 3 + حديث + سيرة 2
+            { name: "محمد حاج قاسم", subject: "الفقه", level: "المستوى الثالث", score: 72 },
+            { name: "محمد حاج قاسم", subject: "الحديث", level: "عام", score: 94 },
+            { name: "محمد حاج قاسم", subject: "السيرة", level: "المستوى الثاني", score: 65 },
+            { name: "عمر حلاق", subject: "الفقه", level: "المستوى الثالث", score: 68 },
+            { name: "عمر حلاق", subject: "الحديث", level: "عام", score: 92 },
+            { name: "عمر حلاق", subject: "السيرة", level: "المستوى الثاني", score: 90 },
+            { name: "عمر صباغ", subject: "الفقه", level: "المستوى الثالث", score: 77 },
+            { name: "عمر صباغ", subject: "الحديث", level: "عام", score: 70 },
+            { name: "عمر صباغ", subject: "السيرة", level: "المستوى الثاني", score: 70 },
+            { name: "مصطفى حسني باشا", subject: "الفقه", level: "المستوى الثالث", score: 72 },
+            { name: "مصطفى حسني باشا", subject: "الحديث", level: "عام", score: 71 },
+            { name: "مصطفى حسني باشا", subject: "السيرة", level: "المستوى الثاني", score: 50 },
+
+            // الفقه 2 + السيرة 1 متقدم
+            { name: "أحمد قرجو", subject: "الفقه", level: "المستوى الثاني", score: 99 },
+            { name: "أحمد قرجو", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 100 },
+            { name: "عمر الفاروق درمش", subject: "الفقه", level: "المستوى الثاني", score: 97 },
+            { name: "عمر الفاروق درمش", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 96 },
+            { name: "أحمد شيخ دبس", subject: "الفقه", level: "المستوى الثاني", score: 92 },
+            { name: "أحمد شيخ دبس", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 96 },
+            { name: "محمد خيرت درمش", subject: "الفقه", level: "المستوى الثاني", score: 91 },
+            { name: "محمد خيرت درمش", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 96 },
+            { name: "ليث حشاش", subject: "الفقه", level: "المستوى الثاني", score: 86 },
+            { name: "ليث حشاش", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 77 },
+            { name: "مصطفى فقش", subject: "الفقه", level: "المستوى الثاني", score: 80 },
+            { name: "مصطفى فقش", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 96 },
+            { name: "عمر حمودة", subject: "الفقه", level: "المستوى الثاني", score: 75 },
+            { name: "عمر حمودة", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 57 },
+            { name: "عمر كوريني", subject: "الفقه", level: "المستوى الثاني", score: 70 },
+            { name: "عمر كوريني", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 49 },
+            { name: "ياسين لبابيدي", subject: "الفقه", level: "المستوى الثاني", score: 65 },
+            { name: "ياسين لبابيدي", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 27 },
+            { name: "حازم شيخ نابو", subject: "الفقه", level: "المستوى الثاني", score: 60 },
+            { name: "حازم شيخ نابو", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 61 },
+            { name: "آدم قرجو", subject: "الفقه", level: "المستوى الثاني", score: 48 },
+            { name: "آدم قرجو", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 12 },
+
+            // الفقه 3 + السيرة 1 متقدم
+            { name: "ميار الكردي", subject: "الفقه", level: "المستوى الثالث", score: 88 },
+            { name: "ميار الكردي", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 100 },
+            { name: "محمد رضا كردي", subject: "الفقه", level: "المستوى الثالث", score: 78 },
+            { name: "محمد رضا كردي", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 70 },
+            { name: "عبد الرحمن شوا", subject: "الفقه", level: "المستوى الثالث", score: 66 },
+            { name: "عبد الرحمن شوا", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 78 },
+            { name: "محمد علي نعساني", subject: "الفقه", level: "المستوى الثالث", score: 68 },
+            { name: "محمد علي نعساني", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 80 },
+            { name: "رضوان صباغ", subject: "الفقه", level: "المستوى الثالث", score: 66 },
+            { name: "رضوان صباغ", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 86 },
+            { name: "تيم عجم", subject: "الفقه", level: "المستوى الثالث", score: 66 },
+            { name: "تيم عجم", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 47 },
+            { name: "نايف حشكرلي", subject: "الفقه", level: "المستوى الثالث", score: 66 },
+            { name: "نايف حشكرلي", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 48 },
+            { name: "صافي الخليل", subject: "الفقه", level: "المستوى الثالث", score: 64 },
+            { name: "صافي الخليل", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 96 },
+            { name: "آدم طيفور", subject: "الفقه", level: "المستوى الثالث", score: 56 },
+            { name: "آدم طيفور", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 77 },
+            { name: "حميد حشكرلي", subject: "الفقه", level: "المستوى الثالث", score: 52 },
+            { name: "حميد حشكرلي", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 86 },
+            { name: "محمد شريقي", subject: "الفقه", level: "المستوى الثالث", score: 38 },
+            { name: "محمد شريقي", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 48 },
+            { name: "سيف الله حشكرلي", subject: "الفقه", level: "المستوى الثالث", score: 34 },
+            { name: "سيف الله حشكرلي", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 48 },
+
+            // الفقه 1 + السيرة 1 متقدم
+            { name: "محمد حشاش", subject: "الفقه", level: "المستوى الأول", score: 91 },
+            { name: "محمد حشاش", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 42 },
+            { name: "عيسى سقعان", subject: "الفقه", level: "المستوى الأول", score: 87 },
+            { name: "عيسى سقعان", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 61 },
+            { name: "محمد عادل سردار", subject: "الفقه", level: "المستوى الأول", score: 85 },
+            { name: "محمد عادل سردار", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 53 },
+            { name: "محمد السعيد", subject: "الفقه", level: "المستوى الأول", score: 80 },
+            { name: "محمد السعيد", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 100 },
+            { name: "ورد عبيدو", subject: "الفقه", level: "المستوى الأول", score: 80 },
+            { name: "ورد عبيدو", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 96 },
+
+            // الفقه 1 + السيرة 1 مبتدئ
+            { name: "مصطفى العليوي", subject: "الفقه", level: "المستوى الأول", score: 95 },
+            { name: "مصطفى العليوي", subject: "السيرة", level: "المستوى الأول (مبتدئ)", score: 100 },
+            { name: "وسام قشرة", subject: "الفقه", level: "المستوى الأول", score: 95 },
+            { name: "وسام قشرة", subject: "السيرة", level: "المستوى الأول (مبتدئ)", score: 0 },
+            { name: "يحيى الهويدي", subject: "الفقه", level: "المستوى الأول", score: 90 },
+            { name: "يحيى الهويدي", subject: "السيرة", level: "المستوى الأول (مبتدئ)", score: 92 },
+            { name: "محمد حمودة", subject: "الفقه", level: "المستوى الأول", score: 90 },
+            { name: "محمد حمودة", subject: "السيرة", level: "المستوى الأول (مبتدئ)", score: 16 },
+            { name: "أحمد العليوي", subject: "الفقه", level: "المستوى الأول", score: 80 },
+            { name: "أحمد العليوي", subject: "السيرة", level: "المستوى الأول (مبتدئ)", score: 94 },
+
+            // الفقه 2 + السيرة 1 مبتدئ
+            { name: "يوسف مجدمي", subject: "الفقه", level: "المستوى الثاني", score: 78 },
+            { name: "يوسف مجدمي", subject: "السيرة", level: "المستوى الأول (مبتدئ)", score: 94 },
+            { name: "عز الدين حسني باشا", subject: "الفقه", level: "المستوى الثاني", score: 40 },
+            { name: "عز الدين حسني باشا", subject: "السيرة", level: "المستوى الأول (مبتدئ)", score: 92 },
+
+            // استثنائية
+            { name: "عثمان سقعان", subject: "الفقه", level: "المستوى الثاني", score: 100 },
+            { name: "عثمان سقعان", subject: "الحديث", level: "عام", score: 27 },
+            { name: "عثمان سقعان", subject: "السيرة", level: "المستوى الثاني", score: 45 },
+            { name: "إبراهيم كردي", subject: "الفقه", level: "المستوى الثاني", score: 75 },
+            { name: "إبراهيم كردي", subject: "الحديث", level: "عام", score: 73 },
+            { name: "إبراهيم كردي", subject: "السيرة", level: "المستوى الثاني", score: 35 },
+            { name: "عمر سقعان", subject: "الفقه", level: "المستوى الأول", score: 95 },
+            { name: "عمر سقعان", subject: "الحديث", level: "عام", score: 54 },
+            { name: "عمر سقعان", subject: "السيرة", level: "المستوى الثاني", score: 25 },
+            { name: "حبيب الله حاج عثمان", subject: "الفقه", level: "المستوى الثاني", score: 35 },
+            { name: "حبيب الله حاج عثمان", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 4 },
+            { name: "حبيب الله حاج عثمان", subject: "السيرة", level: "المستوى الأول (مبتدئ)", score: 80 },
+            { name: "محمد مجد بريمو", subject: "الفقه", level: "المستوى الرابع", score: 71 },
+            { name: "محمد مجد بريمو", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 62 },
+
+            // مفردة
+            { name: "محمد نور بدور", subject: "الفقه", level: "المستوى الرابع", score: 67 },
+            { name: "علي سعود", subject: "الفقه", level: "المستوى الرابع", score: 46 },
+            { name: "محمد عشَّا", subject: "السيرة", level: "المستوى الأول (متقدم)", score: 0 },
+            
+            { name: "إبراهيم إبراهيم الحمَّادة", subject: "الفقه", level: "المستوى الأول", score: 0 },
+            { name: "محمد زُهير الخاني", subject: "السيرة", level: "المستوى الأول (مبتدئ)", score: 0 },
+        ];
+
+        let groupedStudents = [];
+        let filteredStudents = [];
+        let filteredRawRecords = [];
+        let globalChart = null;
+        let distributionChart = null;
+        let studentChart = null;
+        let currentOpenStudent = null;
+
+        function getGradeInfo(score) {
+            if(score >= 90) return { text: "ممتاز", color: "text-green-600 bg-green-100" };
+            if(score >= 80) return { text: "جيد جداً", color: "text-blue-600 bg-blue-100" };
+            if(score >= 70) return { text: "جيد", color: "text-yellow-600 bg-yellow-100" };
+            if(score >= 60) return { text: "مقبول", color: "text-orange-600 bg-orange-100" };
+            if(score > 0) return { text: "ضعيف", color: "text-red-600 bg-red-100" };
+            return { text: "غائب / صفر", color: "text-gray-600 bg-gray-100" };
+        }
+
+        function prepareData() {
+            const studentMap = new Map();
+            rawData.forEach(record => {
+                if (!studentMap.has(record.name)) {
+                    studentMap.set(record.name, { name: record.name, records: [], totalScore: 0, examsCount: 0 });
+                }
+                const st = studentMap.get(record.name);
+                st.records.push(record);
+                if(record.score >= 0) {
+                    st.totalScore += record.score;
+                    st.examsCount++;
+                }
+            });
+
+            groupedStudents = Array.from(studentMap.values()).map(st => {
+                st.avgScore = st.examsCount > 0 ? parseFloat((st.totalScore / st.examsCount).toFixed(1)) : 0;
+                st.gradeInfo = getGradeInfo(st.avgScore);
+                return st;
+            });
+
+            filteredStudents = [...groupedStudents];
+            filteredRawRecords = [...rawData];
+
+            // تعبئة قائمة التنبؤ التلقائي بأسماء الطلاب (Autocomplete)
+            populateAutocompleteList();
+        }
+
+        // إنشاء قائمة الملء التلقائي (Autocomplete)
+        function populateAutocompleteList() {
+            const dataList = document.getElementById('students-list');
+            dataList.innerHTML = ''; // مسح القائمة القديمة
+            groupedStudents.forEach(st => {
+                const option = document.createElement('option');
+                option.value = st.name;
+                dataList.appendChild(option);
+            });
+        }
+
+        function init() {
+            Chart.defaults.font.family = "'Cairo', sans-serif";
+            prepareData();
+            populateFilterOptions();
+            renderTablesAndCharts();
+
+            // Event listener for Input: dynamically updates the dropdowns based on student name matches
+            document.getElementById('search-input').addEventListener('input', updateDropdownsLive);
+        }
+
+        // --- Live Dropdown Updates based on Search Name ---
+        function updateDropdownsLive() {
+            const searchTerm = document.getElementById('search-input').value.trim().toLowerCase();
+            
+            // Find records matching the typed name
+            const matchingRecords = rawData.filter(r => r.name.toLowerCase().includes(searchTerm));
+            
+            const uniqueSubjects = new Set(matchingRecords.map(r => r.subject));
+            const uniqueLevels = new Set(matchingRecords.map(r => r.level));
+            
+            const subjectSelect = document.getElementById('subject-filter');
+            const levelSelect = document.getElementById('level-filter');
+            
+            const currentSub = subjectSelect.value;
+            const currentLvl = levelSelect.value;
+            
+            subjectSelect.innerHTML = '<option value="الكل">جميع المواد المتاحة للطالب</option>';
+            Array.from(uniqueSubjects).sort().forEach(sub => {
+                subjectSelect.innerHTML += `<option value="${sub}" ${sub === currentSub ? 'selected' : ''}>${sub}</option>`;
+            });
+
+            levelSelect.innerHTML = '<option value="الكل">جميع المستويات للطالب</option>';
+            Array.from(uniqueLevels).sort().forEach(lvl => {
+                levelSelect.innerHTML += `<option value="${lvl}" ${lvl === currentLvl ? 'selected' : ''}>${lvl}</option>`;
+            });
+        }
+
+        function populateFilterOptions() {
+            const uniqueSubjects = new Set(rawData.map(r => r.subject));
+            const uniqueLevels = new Set(rawData.map(r => r.level));
+            const subjectSelect = document.getElementById('subject-filter');
+            const levelSelect = document.getElementById('level-filter');
+            
+            subjectSelect.innerHTML = '<option value="الكل">جميع المواد المتاحة</option>';
+            Array.from(uniqueSubjects).sort().forEach(sub => { subjectSelect.innerHTML += `<option value="${sub}">${sub}</option>`; });
+            
+            levelSelect.innerHTML = '<option value="الكل">جميع المستويات المتاحة</option>';
+            Array.from(uniqueLevels).sort().forEach(lvl => { levelSelect.innerHTML += `<option value="${lvl}">${lvl}</option>`; });
+        }
+
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            populateFilterOptions();
+            document.getElementById('subject-filter').value = 'الكل';
+            document.getElementById('level-filter').value = 'الكل';
+        }
+
+        // --- Master "Show Results" Trigger ---
+        function triggerSearchAndSync() {
+            // Apply Filters to Data
+            const searchTerm = document.getElementById('search-input').value.trim().toLowerCase();
+            const subjectFilter = document.getElementById('subject-filter').value;
+            const levelFilter = document.getElementById('level-filter').value;
+
+            filteredStudents = groupedStudents.filter(st => {
+                const matchName = st.name.toLowerCase().includes(searchTerm);
+                const matchSubject = subjectFilter === 'الكل' || st.records.some(r => r.subject === subjectFilter);
+                const matchLevel = levelFilter === 'الكل' || st.records.some(r => r.level === levelFilter);
+                return matchName && matchSubject && matchLevel;
+            });
+
+            filteredRawRecords = rawData.filter(r => {
+                const matchName = r.name.toLowerCase().includes(searchTerm);
+                const matchSubject = subjectFilter === 'الكل' || r.subject === subjectFilter;
+                const matchLevel = levelFilter === 'الكل' || r.level === levelFilter;
+                return matchName && matchSubject && matchLevel;
+            });
+
+            renderTablesAndCharts();
+            sendWebhookSync(searchTerm, subjectFilter, levelFilter);
+        }
+
+        function renderTablesAndCharts() {
+            renderMainTable();
+            renderDetailedTable();
+            updateGlobalKPIs();
+            renderGlobalCharts();
+        }
+
+        // --- Render Tables ---
+        function renderMainTable() {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+            document.getElementById('results-count').innerText = `${filteredStudents.length} طالب`;
+
+            if(filteredStudents.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 md:p-6 text-center text-gray-500 font-bold">لا توجد نتائج.</td></tr>`;
+                return;
+            }
+
+            filteredStudents.forEach((st, index) => {
+                const rowClass = index % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+                tbody.innerHTML += `
+                    <tr class="${rowClass} student-row transition" onclick="openStudentDashboard('${st.name}')">
+                        <td class="p-2 md:p-4 font-bold text-navy truncate compact-padding w-1/2 md:w-auto text-xs md:text-sm">
+                            <i class="fa-solid fa-user text-gold ml-1 text-[10px] md:text-xs"></i> ${st.name}
+                        </td>
+                        <td class="p-2 md:p-4 text-center hide-on-mobile w-20 compact-padding"><span class="bg-slate-200 text-navy px-2 py-0.5 md:py-1 rounded text-xs font-bold">${st.examsCount}</span></td>
+                        <td class="p-2 md:p-4 font-bold text-sm md:text-lg text-center compact-padding w-24">${st.avgScore}%</td>
+                        <td class="p-2 md:p-4 hide-on-mobile compact-padding w-32"><span class="px-2 md:px-3 py-0.5 md:py-1 rounded text-[10px] md:text-xs font-bold ${st.gradeInfo.color}">${st.gradeInfo.text}</span></td>
+                        <td class="p-2 md:p-4 text-center compact-padding w-28">
+                            <button class="text-[10px] md:text-xs bg-gold text-navy px-2 md:px-3 py-1.5 md:py-2 rounded shadow hover:bg-navy hover:text-gold transition whitespace-nowrap">
+                                <i class="fa-solid fa-eye ml-1"></i> التفاصيل
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderDetailedTable() {
+            const tbody = document.getElementById('detailed-table-body');
+            tbody.innerHTML = '';
+
+            if(filteredRawRecords.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500 font-bold">لا توجد تفاصيل لعرضها.</td></tr>`;
+                return;
+            }
+
+            filteredRawRecords.forEach((r, idx) => {
+                const gInfo = getGradeInfo(r.score);
+                const bgClass = idx % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+                tbody.innerHTML += `
+                    <tr class="${bgClass} hover:bg-yellow-50 transition">
+                        <td class="p-2 md:p-4 font-bold text-navy compact-padding w-1/3 text-xs md:text-sm truncate" title="${r.name}">${r.name}</td>
+                        <td class="p-2 md:p-4 compact-padding w-1/4"><span class="bg-gray-200 text-navy px-2 py-0.5 md:py-1 rounded text-[10px] md:text-xs font-bold whitespace-nowrap">${r.subject}</span></td>
+                        <td class="p-2 md:p-4 text-gray-600 hide-on-mobile compact-padding w-1/4 text-xs md:text-sm truncate" title="${r.level}">${r.level}</td>
+                        <td class="p-2 md:p-4 text-center font-bold text-sm md:text-base compact-padding w-20">
+                            ${r.score}
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function updateGlobalKPIs() {
+            document.getElementById('kpi-total-students').innerText = filteredStudents.length;
+            
+            let totalExams = 0; let sumScores = 0; let perfect = 0;
+            filteredRawRecords.forEach(r => {
+                if(r.score >= 0) { totalExams++; sumScores += r.score; if(r.score === 100) perfect++; }
+            });
+            const avg = totalExams > 0 ? (sumScores / totalExams).toFixed(1) : 0;
+            
+            document.getElementById('kpi-total-exams').innerText = totalExams;
+            document.getElementById('kpi-avg-score').innerText = avg + '%';
+            document.getElementById('kpi-perfect-scores').innerText = perfect;
+        }
+
+        // --- Charts ---
+        function renderGlobalCharts() {
+            const subjects = ['الفقه', 'الحديث', 'السيرة'];
+            const barAverages = subjects.map(sub => {
+                let sTotal = 0, sCount = 0;
+                filteredRawRecords.forEach(r => { if(r.subject === sub && r.score >= 0) { sTotal += r.score; sCount++; } });
+                return sCount > 0 ? (sTotal / sCount).toFixed(1) : 0;
+            });
+
+            // Bar Chart
+            if(globalChart) globalChart.destroy();
+            globalChart = new Chart(document.getElementById('scoresChart').getContext('2d'), {
+                type: 'bar',
+                data: { labels: subjects, datasets: [{ label: 'متوسط العلامات', data: barAverages, backgroundColor: '#0F172A', borderRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { max: 100 } } }
+            });
+
+            // Doughnut Chart (Grades Distribution)
+            const distCounts = { 'ممتاز': 0, 'جيد جداً': 0, 'جيد': 0, 'مقبول': 0, 'ضعيف/غياب': 0 };
+            filteredRawRecords.forEach(r => {
+                if(r.score >= 90) distCounts['ممتاز']++;
+                else if(r.score >= 80) distCounts['جيد جداً']++;
+                else if(r.score >= 70) distCounts['جيد']++;
+                else if(r.score >= 60) distCounts['مقبول']++;
+                else distCounts['ضعيف/غياب']++;
+            });
+
+            if(distributionChart) distributionChart.destroy();
+            distributionChart = new Chart(document.getElementById('distributionChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(distCounts),
+                    datasets: [{
+                        data: Object.values(distCounts),
+                        backgroundColor: ['#22c55e', '#3b82f6', '#eab308', '#f97316', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right', labels: { font: { size: 10 } } } }
+                }
+            });
+        }
+
+        // --- Student Specific Modal ---
+        function openStudentDashboard(name) {
+            const student = groupedStudents.find(s => s.name === name);
+            if(!student) return;
+            currentOpenStudent = student;
+
+            document.getElementById('sd-name').innerText = student.name;
+            document.getElementById('sd-exams-count').innerText = student.examsCount;
+            document.getElementById('sd-avg-score').innerText = student.avgScore + '%';
+            document.getElementById('sd-grade').innerText = student.gradeInfo.text;
+            document.getElementById('sd-grade').className = `font-bold px-2 py-0.5 rounded text-sm ${student.gradeInfo.color}`;
+
+            const tbody = document.getElementById('sd-table-body');
+            tbody.innerHTML = '';
+            student.records.forEach(r => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="p-2 md:p-3 border-b truncate w-1/3"><span class="bg-gray-200 px-2 py-0.5 md:py-1 rounded text-[10px] md:text-xs font-bold">${r.subject}</span></td>
+                        <td class="p-2 md:p-3 border-b text-gray-600 hide-on-mobile text-xs md:text-sm truncate w-1/3" title="${r.level}">${r.level}</td>
+                        <td class="p-2 md:p-3 border-b text-center font-bold text-navy text-sm w-1/3">${r.score}</td>
+                    </tr>`;
+            });
+
+            if(studentChart) studentChart.destroy();
+            studentChart = new Chart(document.getElementById('sd-chart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: student.records.map(r => r.subject),
+                    datasets: [{ data: student.records.map(r => r.score), borderColor: '#D4AF37', backgroundColor: 'rgba(212, 175, 55, 0.2)', fill: true, tension: 0.3 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { max: 100 } } }
+            });
+
+            document.getElementById('btn-ai').classList.remove('hidden');
+            document.getElementById('sd-ai-loading').classList.add('hidden');
+            document.getElementById('sd-ai-result').classList.add('hidden');
+            document.getElementById('student-dashboard-modal').classList.remove('hidden');
+            document.getElementById('student-dashboard-modal').style.display = 'flex';
+        }
+
+        function closeStudentDashboard() {
+            document.getElementById('student-dashboard-modal').style.display = 'none';
+        }
+
+        // --- Webhook / Google Sheets Sync ---
+        function sendWebhookSync(searchedName, subject, level) {
+            const btn = document.getElementById('btn-show-results');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري عرض النتيجة...';
+            btn.disabled = true;
+
+            const payload = {
+                searchedName: searchedName || "بحث عام",
+                subjectFilter: subject,
+                levelFilter: level,
+                timestamp: new Date().toLocaleString('ar-SA'),
+                action: "استعلام نتائج"
+            };
+
+            if(googleAppScriptUrl) {
+                fetch(googleAppScriptUrl, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+                .then(() => finalizeWebhook(btn))
+                .catch(() => finalizeWebhook(btn));
+            } else {
+                setTimeout(() => finalizeWebhook(btn), 500);
+            }
+        }
+
+        function finalizeWebhook(btn) {
+            btn.innerHTML = '<i class="fa-solid fa-square-poll-vertical"></i> إظهار النتيجة';
+            btn.disabled = false;
+            
+            const toast = document.getElementById('sheets-toast-global');
+            toast.classList.remove('hidden');
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.classList.add('hidden'); }, 3000);
+        }
+
+        // --- AI Analytics ---
+        async function triggerAIAnalysis() {
+            if(!currentOpenStudent) return;
+            document.getElementById('btn-ai').classList.add('hidden');
+            document.getElementById('sd-ai-loading').classList.remove('hidden');
+
+            if (!geminiApiKey) {
+                setTimeout(() => {
+                    document.getElementById('sd-ai-loading').classList.add('hidden');
+                    const res = document.getElementById('sd-ai-result');
+                    res.classList.remove('hidden');
+                    res.innerHTML = '<span class="text-red-400">عذراً، تحتاج لإضافة مفتاح Gemini API.</span>';
+                }, 1000);
+                return;
+            }
+
+            const recs = currentOpenStudent.records.map(r => `${r.subject}(${r.score})`).join('، ');
+            const prompt = `اكتب تقييماً تشجيعياً موجزاً للطالب "${currentOpenStudent.name}". العلامات: ${recs}. اذكر نقاط قوته ونصيحة بلغة أستاذ دافئ.`;
+            
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${geminiApiKey}`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
+                const result = await response.json();
+                document.getElementById('sd-ai-loading').classList.add('hidden');
+                document.getElementById('sd-ai-result').classList.remove('hidden');
+                document.getElementById('sd-ai-result').innerText = result.candidates?.[0]?.content?.parts?.[0]?.text || "خطأ توليد.";
+            } catch {
+                document.getElementById('sd-ai-loading').classList.add('hidden');
+                document.getElementById('sd-ai-result').classList.remove('hidden');
+                document.getElementById('sd-ai-result').innerText = "حدث خطأ بالاتصال.";
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
