@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل طالب جديد</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1A365D',
+                        accent: '#C59B6D',
+                        'soft-secondary': '#E2D8C1',
+                        background: '#F5F2EB',
+                        'neutral-text': '#4A5568'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F2EB;
+            color: #1A365D;
+            padding: 2rem 1rem;
+        }
+        .toast {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            z-index: 50;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .loader {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        .loader.active {
+            display: inline-block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-lg border-none p-6 md:p-8">
+            <div class="mb-8 border-b border-soft-secondary/30 pb-4">
+                <h2 class="text-2xl font-bold text-primary">تسجيل طالب جديد</h2>
+                <p class="text-neutral-text mt-2">يرجى إدخال بيانات الطالب بدقة في الحقول المخصصة.</p>
+            </div>
+
+            <form id="registrationForm" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- الاسم الكامل -->
+                    <div>
+                        <label class="block text-sm font-semibold text-primary mb-2">الاسم الكامل</label>
+                        <input type="text" id="fullName" required
+                            class="w-full px-4 py-2.5 rounded-lg border border-soft-secondary/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors bg-background/50"
+                            placeholder="الاسم">
+                    </div>
+
+                    <!-- اسم الأب -->
+                    <div>
+                        <label class="block text-sm font-semibold text-primary mb-2">اسم الأب</label>
+                        <input type="text" id="fatherName" required
+                            class="w-full px-4 py-2.5 rounded-lg border border-soft-secondary/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors bg-background/50"
+                            placeholder="اسم الأب">
+                    </div>
+
+                    <!-- اسم الأم -->
+                    <div>
+                        <label class="block text-sm font-semibold text-primary mb-2">اسم الأم</label>
+                        <input type="text" id="motherName" required
+                            class="w-full px-4 py-2.5 rounded-lg border border-soft-secondary/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors bg-background/50"
+                            placeholder="اسم الأم والكنية">
+                    </div>
+
+                    <!-- تاريخ ومكان الولادة -->
+                    <div>
+                        <label class="block text-sm font-semibold text-primary mb-2">تاريخ ومكان الولادة</label>
+                        <input type="text" id="birthDateAndPlace" required
+                            class="w-full px-4 py-2.5 rounded-lg border border-soft-secondary/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors bg-background/50"
+                            placeholder="مثال: دمشق 2010/05/14">
+                    </div>
+
+                    <!-- السكن الحالي -->
+                    <div>
+                        <label class="block text-sm font-semibold text-primary mb-2">السكن الحالي</label>
+                        <input type="text" id="currentResidence" required
+                            class="w-full px-4 py-2.5 rounded-lg border border-soft-secondary/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors bg-background/50"
+                            placeholder="المنطقة - الشارع - البناء">
+                    </div>
+
+                    <!-- رقم الهاتف -->
+                    <div>
+                        <label class="block text-sm font-semibold text-primary mb-2">رقم الهاتف</label>
+                        <input type="tel" id="phoneNumber" required dir="ltr" style="text-align: right;"
+                            class="w-full px-4 py-2.5 rounded-lg border border-soft-secondary/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors bg-background/50"
+                            placeholder="رقم الموبايل أو الأرضي">
+                    </div>
+
+                    <!-- مهنة الوالد -->
+                    <div>
+                        <label class="block text-sm font-semibold text-primary mb-2">مهنة الوالد</label>
+                        <input type="text" id="fatherProfession" required
+                            class="w-full px-4 py-2.5 rounded-lg border border-soft-secondary/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors bg-background/50"
+                            placeholder="مهنة الوالد الحالية">
+                    </div>
+
+                    <!-- تاريخ التسجيل -->
+                    <div>
+                        <label class="block text-sm font-semibold text-primary mb-2">تاريخ التسجيل</label>
+                        <input type="date" id="registrationDate" required
+                            class="w-full px-4 py-2.5 rounded-lg border border-soft-secondary/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors bg-background/50">
+                    </div>
+
+                    <!-- صورة شخصية -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-primary mb-2">صورة شخصية</label>
+                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-soft-secondary/50 border-dashed rounded-lg hover:bg-background/50 transition-colors">
+                            <div class="space-y-1 text-center">
+                                <svg class="mx-auto h-12 w-12 text-neutral-text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                                <div class="flex text-sm text-neutral-text justify-center mt-4">
+                                    <label for="profilePicture" class="relative cursor-pointer rounded-md font-medium text-accent hover:text-primary focus-within:outline-none">
+                                        <span>اختر صورة</span>
+                                        <input id="profilePicture" type="file" class="sr-only" accept="image/*">
+                                    </label>
+                                    <p class="pr-1">أو اسحب وأفلت هنا</p>
+                                </div>
+                                <p class="text-xs text-neutral-text mt-2">PNG, JPG, GIF حتى 2MB</p>
+                                <p id="profilePictureName" class="text-sm text-primary font-semibold mt-2 hidden"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- هل الطالب يتيم -->
+                    <div class="md:col-span-2 flex items-center mt-2">
+                        <input id="isOrphan" type="checkbox"
+                            class="h-5 w-5 rounded border-soft-secondary text-accent focus:ring-accent">
+                        <label for="isOrphan" class="mr-3 text-sm font-semibold text-primary">هل الطالب يتيم؟</label>
+                    </div>
+
+                    <!-- صورة دفتر العائلة -->
+                    <div class="md:col-span-2 mt-4">
+                        <label class="block text-sm font-semibold text-primary mb-2">صورة دفتر العائلة</label>
+                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-soft-secondary/50 border-dashed rounded-lg hover:bg-background/50 transition-colors">
+                            <div class="space-y-1 text-center">
+                                <svg class="mx-auto h-12 w-12 text-neutral-text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                                <div class="flex text-sm text-neutral-text justify-center mt-4">
+                                    <label for="familyBookPicture" class="relative cursor-pointer rounded-md font-medium text-accent hover:text-primary focus-within:outline-none">
+                                        <span>اختر صورة</span>
+                                        <input id="familyBookPicture" type="file" class="sr-only" accept="image/*">
+                                    </label>
+                                    <p class="pr-1">أو اسحب وأفلت هنا</p>
+                                </div>
+                                <p class="text-xs text-neutral-text mt-2">PNG, JPG, GIF حتى 2MB</p>
+                                <p id="familyBookPictureName" class="text-sm text-primary font-semibold mt-2 hidden"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 pt-6 border-t border-soft-secondary/30 mt-8">
+                    <button type="submit" id="submitBtn"
+                        class="px-8 py-3 bg-accent hover:bg-[#a88254] text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+                        <div class="loader" id="submitLoader"></div>
+                        <span id="submitText">حفظ البيانات</span>
+                    </button>
+                    <button type="button" id="cancelBtn"
+                        class="px-8 py-3 bg-soft-secondary hover:bg-[#c8b996] text-primary font-bold rounded-lg transition-colors disabled:opacity-70 disabled:cursor-not-allowed">
+                        إلغاء
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="successToast" class="toast fixed bottom-8 left-8 bg-primary text-white px-6 py-4 rounded-lg shadow-xl flex items-center gap-3">
+        <svg class="text-accent h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span class="font-semibold">تم تسجيل الطالب بنجاح!</span>
+    </div>
+
+    <!-- Error Toast -->
+    <div id="errorToast" class="toast fixed bottom-8 left-8 bg-red-600 text-white px-6 py-4 rounded-lg shadow-xl flex items-center gap-3">
+        <svg class="text-white h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span id="errorMessage" class="font-semibold">حدث خطأ</span>
+    </div>
+
+    <script>
+        // Set default date
+        document.getElementById('registrationDate').valueAsDate = new Date();
+
+        // Handle file name display
+        const profileInput = document.getElementById('profilePicture');
+        const profileName = document.getElementById('profilePictureName');
+        profileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                profileName.textContent = 'تم اختيار: ' + e.target.files[0].name;
+                profileName.classList.remove('hidden');
+            } else {
+                profileName.classList.add('hidden');
+            }
+        });
+
+        const familyInput = document.getElementById('familyBookPicture');
+        const familyName = document.getElementById('familyBookPictureName');
+        familyInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                familyName.textContent = 'تم اختيار: ' + e.target.files[0].name;
+                familyName.classList.remove('hidden');
+            } else {
+                familyName.classList.add('hidden');
+            }
+        });
+
+        // Toasts
+        function showToast(id, message = null) {
+            const toast = document.getElementById(id);
+            if (message && id === 'errorToast') {
+                document.getElementById('errorMessage').textContent = message;
+            }
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Form Submission
+        const form = document.getElementById('registrationForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const submitLoader = document.getElementById('submitLoader');
+        const submitText = document.getElementById('submitText');
+
+        function setLoading(isLoading) {
+            submitBtn.disabled = isLoading;
+            cancelBtn.disabled = isLoading;
+            if (isLoading) {
+                submitLoader.classList.add('active');
+                submitText.textContent = 'جاري الحفظ...';
+            } else {
+                submitLoader.classList.remove('active');
+                submitText.textContent = 'حفظ البيانات';
+            }
+        }
+
+        function resetForm() {
+            form.reset();
+            document.getElementById('registrationDate').valueAsDate = new Date();
+            profileName.classList.add('hidden');
+            familyName.classList.add('hidden');
+        }
+
+        cancelBtn.addEventListener('click', resetForm);
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            setLoading(true);
+
+            const formData = {
+                fullName: document.getElementById('fullName').value,
+                fatherName: document.getElementById('fatherName').value,
+                motherName: document.getElementById('motherName').value,
+                birthDateAndPlace: document.getElementById('birthDateAndPlace').value,
+                currentResidence: document.getElementById('currentResidence').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
+                fatherProfession: document.getElementById('fatherProfession').value,
+                registrationDate: document.getElementById('registrationDate').value,
+                isOrphan: document.getElementById('isOrphan').checked,
+                hasProfilePic: profileInput.files.length > 0,
+                hasFamilyPic: familyInput.files.length > 0
+            };
+
+            const googleSheetData = {
+                targetSheet: "الطلاب_3_2026",
+                timestamp: new Date().getTime(),
+                values: [
+                    formData.fullName,
+                    formData.fatherName,
+                    formData.motherName,
+                    formData.birthDateAndPlace,
+                    formData.currentResidence,
+                    formData.phoneNumber,
+                    formData.fatherProfession,
+                    formData.registrationDate,
+                    formData.hasProfilePic ? "تم إرفاق صورة (رابط مؤقت)" : "",
+                    formData.hasFamilyPic ? "تم إرفاق صورة (رابط مؤقت)" : "",
+                    formData.isOrphan ? "نعم" : "لا"
+                ]
+            };
+
+            // Await the fetch to ensure it completes before the component might unmount
+            console.log("Sending Data...", googleSheetData);
+            fetch("https://script.google.com/macros/s/AKfycbyy68ZX7nnHfBmScWnjaI9ge7wkJ0Uor1l3UmpDFJP3nMpA6S7pQwFA9M1Cb64ccsEM/exec", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "text/plain",
+                },
+                body: JSON.stringify(googleSheetData),
+                mode: "no-cors"
+            }).then(() => {
+                console.log("Data Sent Successfully");
+                // Instant reset and success feedback
+                setTimeout(() => {
+                    setLoading(false);
+                    showToast('successToast');
+                    resetForm();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 500); 
+            }).catch((err) => {
+                console.error("Error submitting form:", err);
+                setLoading(false);
+                showToast('errorToast');
+            });
+        });
+    </script>
+</body>
+</html>
